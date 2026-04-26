@@ -1,0 +1,213 @@
+{
+    "$id": "https://ms0503.dev/schemas/mc-mod-downloader/mods",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+        "$schema": {
+            "format": "uri",
+            "type": "string"
+        },
+        "mods": {
+            "description": "List of mods",
+            "items": {
+                "allOf": [
+                    {
+                        "if": {
+                            "properties": {
+                                "source": {
+                                    "const": "curseforge"
+                                }
+                            }
+                        },
+                        "then": {
+                            "additionalProperties": false,
+                            "properties": {
+                                "fileId": {
+                                    "description": "File ID of mod",
+                                    "type": "integer"
+                                },
+                                "name": {
+                                    "description": "Name of mod file",
+                                    "type": "string"
+                                },
+                                "projectId": {
+                                    "description": "Project ID of mod",
+                                    "type": "integer"
+                                },
+                                "side": {
+                                    "additionalProperties": false,
+                                    "description": "Requirement for each side",
+                                    "properties": {
+                                        "client": {
+                                            "description": "Requirement for client side",
+                                            "enum": [
+                                                "none",
+                                                "optional",
+                                                "require"
+                                            ]
+                                        },
+                                        "server": {
+                                            "description": "Requirement for server side",
+                                            "enum": [
+                                                "none",
+                                                "optional",
+                                                "require"
+                                            ]
+                                        }
+                                    },
+                                    "type": "object"
+                                },
+                                "source": {
+                                    "const": "curseforge"
+                                }
+                            },
+                            "required": [
+                                "fileId",
+                                "name",
+                                "projectId",
+                                "side",
+                                "source"
+                            ]
+                        }
+                    },
+                    {
+                        "if": {
+                            "properties": {
+                                "source": {
+                                    "const": "file"
+                                }
+                            }
+                        },
+                        "then": {
+                            "additionalProperties": false,
+                            "properties": {
+                                "name": {
+                                    "description": "Name of mod file",
+                                    "type": "string"
+                                },
+                                "side": {
+                                    "additionalProperties": false,
+                                    "description": "Requirement for each side",
+                                    "properties": {
+                                        "client": {
+                                            "description": "Requirement for client side",
+                                            "enum": [
+                                                "none",
+                                                "optional",
+                                                "require"
+                                            ]
+                                        },
+                                        "server": {
+                                            "description": "Requirement for server side",
+                                            "enum": [
+                                                "none",
+                                                "optional",
+                                                "require"
+                                            ]
+                                        }
+                                    },
+                                    "type": "object"
+                                },
+                                "source": {
+                                    "const": "file"
+                                },
+                                "url": {
+                                    "description": "URL of mod file",
+                                    "format": "uri",
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "name",
+                                "side",
+                                "source",
+                                "url"
+                            ]
+                        }
+                    },
+                    {
+                        "if": {
+                            "properties": {
+                                "source": {
+                                    "const": "modrinth"
+                                }
+                            }
+                        },
+                        "then": {
+                            "additionalProperties": false,
+                            "properties": {
+                                "name": {
+                                    "description": "Name of mod file",
+                                    "type": "string"
+                                },
+                                "projectId": {
+                                    "description": "Project ID of mod",
+                                    "pattern": "[\\w!@$()`.+,\"\\-']{3,64}",
+                                    "type": "string"
+                                },
+                                "side": {
+                                    "additionalProperties": false,
+                                    "description": "Requirement for each side",
+                                    "properties": {
+                                        "client": {
+                                            "description": "Requirement for client side",
+                                            "enum": [
+                                                "none",
+                                                "optional",
+                                                "require"
+                                            ]
+                                        },
+                                        "server": {
+                                            "description": "Requirement for server side",
+                                            "enum": [
+                                                "none",
+                                                "optional",
+                                                "require"
+                                            ]
+                                        }
+                                    },
+                                    "type": "object"
+                                },
+                                "source": {
+                                    "const": "modrinth"
+                                },
+                                "versionId": {
+                                    "description": "Version ID of mod",
+                                    "pattern": "[\\w!@$()`.+,\"\\-']{3,64}",
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "name",
+                                "projectId",
+                                "side",
+                                "source",
+                                "versionId"
+                            ]
+                        }
+                    }
+                ],
+                "properties": {
+                    "source": {
+                        "description": "Mod source",
+                        "enum": [
+                            "curseforge",
+                            "file",
+                            "modrinth"
+                        ]
+                    }
+                },
+                "required": [
+                    "source"
+                ],
+                "type": "object"
+            },
+            "type": "array"
+        }
+    },
+    "required": [
+        "mods"
+    ],
+    "title": "Mods",
+    "type": "object"
+}
