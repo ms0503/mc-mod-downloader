@@ -26,6 +26,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     {
         "json" => serde_json::from_str(&config)?,
         "toml" => toml::from_str(&config)?,
+        "yaml" | "yml" => serde_yaml::from_str(&config)?,
         t => panic!("Unsupported file type: {}", t)
     };
     match opts.command {
