@@ -10,13 +10,23 @@ use tokio::io::AsyncReadExt;
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
     let opts = Options::parse();
-    let mut config = File::open(opts.config).await?;
+    let mut config = File::open(&opts.config).await?;
     let config = {
         let mut buf = String::new();
         config.read_to_string(&mut buf).await?;
         buf
     };
-    let config = serde_json::from_str::<Config>(&config)?;
+    let config: Config = match opts
+        .config
+        .extension()
+        .expect("Cannot guess config file type")
+        .to_str()
+        .unwrap()
+    {
+        "json" => serde_json::from_str(&config)?,
+        "toml" => toml::from_str(&config)?,
+        t => panic!("Unsupported file type: {}", t)
+    };
     match opts.command {
         Commands::Download {
             ..

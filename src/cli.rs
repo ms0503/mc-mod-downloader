@@ -20,6 +20,7 @@ pub enum Commands {
         /// Path to mods directory
         #[arg(default_value = "mods", long, short)]
         dir: PathBuf,
+        /// Whether to include optional mods
         #[arg(long, short = 'o')]
         include_optional: bool,
         /// Side of mod(s) to download

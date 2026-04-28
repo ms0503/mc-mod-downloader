@@ -3,6 +3,8 @@ use serde::Serialize;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Config {
+    #[serde(rename = "$schema", skip)]
+    pub _schema: (),
     pub mods: Vec<Mod>
 }
 
@@ -67,7 +69,7 @@ pub struct Side {
     pub server: Requirement
 }
 
-#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[serde(rename_all = "lowercase")]
 pub enum Requirement {
     None,
