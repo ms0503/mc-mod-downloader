@@ -101,6 +101,7 @@ fn put_before_body(body: &mut String) {
     body.push_str("& > * {");
     body.push_str("border-right: 1px solid #111;");
     body.push_str("padding: 0.5rem 1rem;");
+    body.push_str("width: 100%;");
     body.push_str("&:not(.table-header) {");
     body.push_str("place-self: center;");
     body.push('}');
