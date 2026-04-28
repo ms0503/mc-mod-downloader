@@ -16,11 +16,10 @@
           jsonfmt.enable = true;
           mdformat = {
             enable = true;
-            package = pkgs.mdformat.withPlugins (
+            plugins =
               ps: with ps; [
                 mdformat-gfm
-              ]
-            );
+              ];
             settings = {
               end-of-line = "lf";
               number = true;
