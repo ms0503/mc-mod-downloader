@@ -12,22 +12,44 @@ bulk via the command line.
 ## Usage
 
 ```shell
-mc-mod-downloader download [OPTIONS] --side <SIDE>
+mc-mod-downloader [OPTIONS] <COMMAND>
 ```
 
-### Options
+### Common Options
+
+| Short |   Long    |  Description  |
+| :---: | :-------: | :-----------: |
+|  -V   | --version | Print version |
+|  -h   |  --help   |  Print help   |
+
+### Download Subcommand
+
+```shell
+mc-mod-downloader download [OPTIONS] --side <SIDE>
+```
 
 | Short |        Long        |                           Description                            |
 | :---: | :----------------: | :--------------------------------------------------------------: |
 |  -c   |      --config      |         Path to config file [Default value: "mods.json"]         |
 |  -d   |       --dir        |          Path to mods directory [Default value: "mods"]          |
-|  -h   |       --help       |                            Print help                            |
-|  -o   | --include-optional |      Download optional mods as well [Default value: false]       |
+|  -o   | --include-optional |     Whether to download optional mods [Default value: false]     |
 |  -s   |       --side       | Side of mod(s) to download [Possible values: "client", "server"] |
+
+### Generate Page Subcommand
+
+```shell
+mc-mod-downloader generate-page [OPTIONS]
+```
+
+| Short | Long  |                   Description                    |
+| :---: | :---: | :----------------------------------------------: |
+|  -o   | --out | Path to output file [Default value: "mods.html"] |
 
 ## Config File
 
 Schema: [mods.schema.json](mods.schema.json)
+
+Supported JSON, TOML and YAML.
 
 ```toml
 # "mods" - List of mods
