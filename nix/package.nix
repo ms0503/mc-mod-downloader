@@ -11,6 +11,14 @@ rustPlatform.buildRustPackage {
   inherit (cargoToml.package) version;
   RUSTFLAGS = "-Clink-arg=-fuse-ld=mold";
   cargoLock.lockFile = ../Cargo.lock;
+  meta = {
+    description = "A tool that download mods from multiple sources in bulk via the command line";
+    license = lib.licenses.mit;
+    mainProgram = "mc-mod-downloader";
+    sourceProvenance = with lib.sourceTypes; [
+      fromSource
+    ];
+  };
   nativeBuildInputs = [
     mold
   ];
