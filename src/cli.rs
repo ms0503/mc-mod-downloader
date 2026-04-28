@@ -26,5 +26,11 @@ pub enum Commands {
         /// Side of mod(s) to download
         #[arg(long, short, value_enum)]
         side: Sides
+    },
+    // Generate web page of mod list
+    GeneratePage {
+        /// Path to output file
+        #[arg(default_value = "mods.html", long, short)]
+        out: PathBuf
     }
 }

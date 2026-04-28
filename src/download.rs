@@ -8,9 +8,9 @@ use std::path::Path;
 use tokio::fs;
 use tokio::task::JoinHandle;
 
-mod curseforge;
-mod file;
-mod modrinth;
+pub(crate) mod curseforge;
+pub(crate) mod file;
+pub(crate) mod modrinth;
 
 #[derive(Clone, Copy, Debug, ValueEnum)]
 pub enum Sides {
@@ -25,7 +25,10 @@ pub async fn run(command: Commands, config: Config) -> Result<(), Box<dyn Error>
         dir,
         include_optional,
         side
-    } = command;
+    } = command
+    else {
+        unreachable!()
+    };
     if fs::metadata(&dir).await.is_err() {
         fs::create_dir_all(&dir).await?;
     }

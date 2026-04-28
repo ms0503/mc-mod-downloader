@@ -3,6 +3,7 @@ use mc_mod_downloader::cli::Commands;
 use mc_mod_downloader::cli::Options;
 use mc_mod_downloader::config::Config;
 use mc_mod_downloader::download;
+use mc_mod_downloader::generate_page;
 use std::error::Error;
 use tokio::fs::File;
 use tokio::io::AsyncReadExt;
@@ -30,6 +31,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
     match opts.command {
         Commands::Download {
             ..
-        } => download::run(opts.command, config).await
+        } => download::run(opts.command, config).await,
+        Commands::GeneratePage {
+            ..
+        } => generate_page::run(opts.command, config).await
     }
 }
