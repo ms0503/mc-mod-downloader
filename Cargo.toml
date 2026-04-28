@@ -1,5 +1,6 @@
 [dependencies]
 serde_json = "1"
+serde_repr = "0.1"
 
 [dependencies.clap]
 features = ["derive"]

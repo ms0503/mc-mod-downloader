@@ -1,8 +1,15 @@
 use crate::config::Mod;
+use crate::constants::CURSEFORGE_API_KEY;
+use crate::models::curseforge::GetModFileResponse;
+use reqwest::Client;
 use std::error::Error;
 use std::path::Path;
+use tokio::fs::File;
+use tokio::io;
 
+#[allow(unreachable_code, unused_variables)]
 pub async fn get_file(entry: Mod, dir: &Path) -> Result<(), Box<dyn Error>> {
+    unimplemented!("CurseForge Core API requires API key.");
     let Mod::CurseForge {
         file_id,
         name,
@@ -17,6 +24,19 @@ pub async fn get_file(entry: Mod, dir: &Path) -> Result<(), Box<dyn Error>> {
         path.push(&name);
         path
     };
-    unimplemented!();
+    let file = Client::new()
+        .get(format!(
+            "https://api.curseforge.com/v1/mods/{}/files/{}",
+            project_id, file_id
+        ))
+        .header("x-api-key", CURSEFORGE_API_KEY)
+        .send()
+        .await?
+        .json::<GetModFileResponse>()
+        .await?;
+    let data = reqwest::get(file.data.download_url).await?.bytes().await?;
+    let mut out_file = File::create(out_filename).await?;
+    io::copy(&mut data.as_ref(), &mut out_file).await?;
+    println!("[INFO] {}: Downloaded", name);
     Ok(())
 }
