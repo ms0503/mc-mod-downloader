@@ -6,7 +6,9 @@ use std::path::Path;
 use tokio::fs::File;
 use tokio::io;
 
+const MODRINTH_API_GET_VERSION_BASE: &str = "/v2/version";
 const MODRINTH_API_HOST: &str = "api.modrinth.com";
+const MODRINTH_DOWNLOAD_BASE: &str = "/data";
 const MODRINTH_DOWNLOAD_HOST: &str = "cdn.modrinth.com";
 
 pub async fn get_file(entry: Mod, dir: &Path) -> Result<(), Box<dyn Error>> {
@@ -54,10 +56,18 @@ pub async fn get_download_url(entry: &Mod) -> Result<String, Box<dyn Error>> {
 
 fn validate_modrinth_api_url(version_id: &str) -> Result<Url, Box<dyn Error>> {
     let url = Url::parse(&format!(
-        "https://api.modrinth.com/v2/version/{}",
-        version_id
+        "https://{}{}/{}",
+        MODRINTH_API_HOST, MODRINTH_API_GET_VERSION_BASE, version_id
     ))?;
-    if url.scheme() == "https" && url.host_str() == Some(MODRINTH_API_HOST) {
+    let is_valid = url.scheme() == "https"
+        && url.host_str() == Some(MODRINTH_API_HOST)
+        && url.username().is_empty()
+        && url.password().is_none()
+        && (url.port().is_none() || url.port() == Some(443))
+        && url
+            .path()
+            .starts_with(&format!("{}/", MODRINTH_API_GET_VERSION_BASE));
+    if is_valid {
         Ok(url)
     } else {
         Err("Invalid Modrinth API URL".into())
@@ -66,7 +76,15 @@ fn validate_modrinth_api_url(version_id: &str) -> Result<Url, Box<dyn Error>> {
 
 fn validate_modrinth_download_url(raw: &str) -> Result<Url, Box<dyn Error>> {
     let url = Url::parse(raw)?;
-    if url.scheme() == "https" && url.host_str() == Some(MODRINTH_DOWNLOAD_HOST) {
+    let is_valid = url.scheme() == "https"
+        && url.host_str() == Some(MODRINTH_DOWNLOAD_HOST)
+        && url.username().is_empty()
+        && url.password().is_none()
+        && (url.port().is_none() || url.port() == Some(443))
+        && url
+            .path()
+            .starts_with(&format!("{}/", MODRINTH_DOWNLOAD_BASE));
+    if is_valid {
         Ok(url)
     } else {
         Err("Invalid Modrinth download URL".into())
