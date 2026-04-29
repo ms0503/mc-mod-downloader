@@ -23,7 +23,6 @@ static CURSEFORGE_DOWNLOAD_PATH_PATTERN: Lazy<Regex> =
 
 #[allow(unreachable_code, unused_variables)]
 pub async fn get_file(entry: Mod, dir: &Path) -> Result<(), Box<dyn Error>> {
-    unimplemented!("CurseForge Core API requires API key.");
     let Mod::CurseForge {
         file_id,
         name,
@@ -50,22 +49,30 @@ pub async fn get_file(entry: Mod, dir: &Path) -> Result<(), Box<dyn Error>> {
 pub async fn get_download_url(entry: &Mod) -> Result<String, Box<dyn Error>> {
     let Mod::CurseForge {
         file_id,
+        name,
         project_id,
         ..
     } = entry
     else {
         unreachable!()
     };
-    let api_url = validate_api_url(*project_id, *file_id)?;
-    let file = Client::new()
-        .get(api_url)
-        .header("x-api-key", CURSEFORGE_API_KEY)
-        .send()
-        .await?
-        .json::<GetModFileResponse>()
-        .await?;
-    let url = validate_canonicalize_download_url(&file.data.download_url)?;
-    Ok(url.to_string())
+    match CURSEFORGE_API_KEY {
+        None => {
+            Err(format!("CurseForge Core API requires API key.\nSee: https://www.google.com/search?q={}+site%3Awww.curseforge.com", name).into())
+        }
+        Some(api_key) => {
+            let api_url = validate_api_url(*project_id, *file_id)?;
+            let file = Client::new()
+                .get(api_url)
+                .header("x-api-key", api_key)
+                .send()
+                .await?
+                .json::<GetModFileResponse>()
+                .await?;
+            let url = validate_canonicalize_download_url(&file.data.download_url)?;
+            Ok(url.to_string())
+        }
+    }
 }
 
 fn validate_api_url(project_id: u32, file_id: u32) -> Result<Url, Box<dyn Error>> {
