@@ -1,4 +1,4 @@
-use crate::cli::Commands;
+use crate::cli::GeneratePageOptions;
 use crate::config::Config;
 use crate::config::Mod;
 use crate::config::Requirement;
@@ -9,13 +9,10 @@ use tokio::fs;
 use tokio::fs::File;
 use tokio::io::AsyncWriteExt;
 
-pub async fn run(command: Commands, config: Config) -> Result<(), Box<dyn Error>> {
-    let Commands::GeneratePage {
+pub async fn run(options: GeneratePageOptions, config: Config) -> Result<(), Box<dyn Error>> {
+    let GeneratePageOptions {
         out
-    } = command
-    else {
-        unreachable!()
-    };
+    } = options;
     let mut body = String::new();
     let mut client_required_mods = String::new();
     let mut client_optional_mods = String::new();

@@ -17,26 +17,32 @@ pub struct Options {
 #[derive(Debug, Subcommand)]
 pub enum Commands {
     /// Download mod(s)
-    Download {
-        /// Path to mods directory
-        #[arg(default_value = "mods", long, short)]
-        dir: PathBuf,
-        /// Whether to include optional mods
-        #[arg(long, short = 'o')]
-        include_optional: bool,
-        /// Mod sources to skip
-        #[arg(long, value_delimiter = ',')]
-        skip_source: Vec<Source>,
-        /// Side of mod(s) to download
-        #[arg(long, short, value_enum)]
-        side: Sides
-    },
+    Download(DownloadOptions),
     // Generate web page of mod list
-    GeneratePage {
-        /// Path to output file
-        #[arg(default_value = "mods.html", long, short)]
-        out: PathBuf
-    }
+    GeneratePage(GeneratePageOptions)
+}
+
+#[derive(Debug, Parser)]
+pub struct DownloadOptions {
+    /// Path to mods directory
+    #[arg(default_value = "mods", long, short)]
+    pub dir: PathBuf,
+    /// Whether to include optional mods
+    #[arg(long, short = 'o')]
+    pub include_optional: bool,
+    /// Mod sources to skip
+    #[arg(long, value_delimiter = ',')]
+    pub skip_source: Vec<Source>,
+    /// Side of mod(s) to download
+    #[arg(long, short, value_enum)]
+    pub side: Sides
+}
+
+#[derive(Debug, Parser)]
+pub struct GeneratePageOptions {
+    /// Path to output file
+    #[arg(default_value = "mods.html", long, short)]
+    pub out: PathBuf
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq, ValueEnum)]

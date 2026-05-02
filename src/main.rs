@@ -30,11 +30,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         t => panic!("Unsupported file type: {}", t)
     };
     match opts.command {
-        Commands::Download {
-            ..
-        } => download::run(opts.command, config).await,
-        Commands::GeneratePage {
-            ..
-        } => generate_page::run(opts.command, config).await
+        Commands::Download(options) => download::run(options, config).await,
+        Commands::GeneratePage(options) => generate_page::run(options, config).await
     }
 }

@@ -1,4 +1,4 @@
-use crate::cli::Commands;
+use crate::cli::DownloadOptions;
 use crate::cli::Source;
 use crate::config::Config;
 use crate::config::Mod;
@@ -22,16 +22,13 @@ pub enum Sides {
     Server
 }
 
-pub async fn run(command: Commands, config: Config) -> Result<(), Box<dyn Error>> {
-    let Commands::Download {
+pub async fn run(options: DownloadOptions, config: Config) -> Result<(), Box<dyn Error>> {
+    let DownloadOptions {
         dir,
         include_optional,
         skip_source,
         side
-    } = command
-    else {
-        unreachable!()
-    };
+    } = options;
     if fs::metadata(&dir).await.is_err() {
         fs::create_dir_all(&dir).await?;
     }
