@@ -1,5 +1,5 @@
 use clap::Parser;
-use mc_mod_downloader::cli::Commands;
+use mc_mod_downloader::cli::Command;
 use mc_mod_downloader::cli::Options;
 use mc_mod_downloader::config::Config;
 use mc_mod_downloader::download;
@@ -30,7 +30,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         t => panic!("Unsupported file type: {}", t)
     };
     match opts.command {
-        Commands::Download(options) => download::run(options, config).await,
-        Commands::GeneratePage(options) => generate_page::run(options, config).await
+        Command::Download(options) => download::run(options, config).await,
+        Command::GeneratePage(options) => generate_page::run(options, config).await
     }
 }

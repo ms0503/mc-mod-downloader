@@ -15,7 +15,7 @@ pub(crate) mod file;
 pub(crate) mod modrinth;
 
 #[derive(Clone, Copy, Debug, ValueEnum)]
-pub enum Sides {
+pub enum Side {
     /// Download client-side mod(s)
     Client,
     /// Download server-side mod(s)
@@ -38,7 +38,7 @@ pub async fn run(options: DownloadOptions, config: Config) -> Result<(), Box<dyn
         let name = entry.name().clone();
         let skip_source = skip_source.clone();
         match side {
-            Sides::Client => tasks.push(tokio::spawn(async move {
+            Side::Client => tasks.push(tokio::spawn(async move {
                 if let Err(err) = get_file(
                     entry.side().client,
                     include_optional,
@@ -51,7 +51,7 @@ pub async fn run(options: DownloadOptions, config: Config) -> Result<(), Box<dyn
                     eprintln!("[ERROR] {}: Failed to download: {}", name, err);
                 }
             })),
-            Sides::Server => tasks.push(tokio::spawn(async move {
+            Side::Server => tasks.push(tokio::spawn(async move {
                 if let Err(err) = get_file(
                     entry.side().server,
                     include_optional,

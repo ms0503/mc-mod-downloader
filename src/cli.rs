@@ -1,4 +1,4 @@
-use crate::download::Sides;
+use crate::download::Side;
 use clap::Parser;
 use clap::Subcommand;
 use clap::ValueEnum;
@@ -8,14 +8,14 @@ use std::path::PathBuf;
 #[command(about, version)]
 pub struct Options {
     #[command(subcommand)]
-    pub command: Commands,
+    pub command: Command,
     /// Path to config file
     #[arg(default_value = "mods.json", long, short)]
     pub config: PathBuf
 }
 
 #[derive(Debug, Subcommand)]
-pub enum Commands {
+pub enum Command {
     /// Download mod(s)
     Download(DownloadOptions),
     // Generate web page of mod list
@@ -35,7 +35,7 @@ pub struct DownloadOptions {
     pub skip_source: Vec<Source>,
     /// Side of mod(s) to download
     #[arg(long, short, value_enum)]
-    pub side: Sides
+    pub side: Side
 }
 
 #[derive(Debug, Parser)]
