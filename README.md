@@ -28,12 +28,13 @@ mc-mod-downloader [OPTIONS] <COMMAND>
 mc-mod-downloader download [OPTIONS] --side <SIDE>
 ```
 
-| Short |        Long        |                           Description                            |
-| :---: | :----------------: | :--------------------------------------------------------------: |
-|  -c   |      --config      |         Path to config file [Default value: "mods.json"]         |
-|  -d   |       --dir        |          Path to mods directory [Default value: "mods"]          |
-|  -o   | --include-optional |     Whether to download optional mods [Default value: false]     |
-|  -s   |       --side       | Side of mod(s) to download [Possible values: "client", "server"] |
+| Short |        Long        |                                       Description                                        |
+| :---: | :----------------: | :--------------------------------------------------------------------------------------: |
+|  -c   |      --config      |                     Path to config file [Default value: "mods.json"]                     |
+|  -d   |       --dir        |                      Path to mods directory [Default value: "mods"]                      |
+|  -o   | --include-optional |                 Whether to download optional mods [Default value: false]                 |
+|  -s   |       --side       |             Side of mod(s) to download [Possible values: "client", "server"]             |
+|       |   --skip-source    | Mod sources to skip [Comma separated, possible values: "curseforge", "file", "modrinth"] |
 
 ### Generate Page Subcommand
 
