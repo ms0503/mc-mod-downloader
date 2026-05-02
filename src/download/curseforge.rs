@@ -64,7 +64,8 @@ pub async fn get_download_url(entry: &Mod) -> Result<String, Box<dyn Error>> {
         .await?
         .json::<GetModFileResponse>()
         .await?;
-    Ok(file.data.download_url)
+    let url = validate_canonicalize_download_url(&file.data.download_url)?;
+    Ok(url.to_string())
 }
 
 fn validate_api_url(project_id: u32, file_id: u32) -> Result<Url, Box<dyn Error>> {

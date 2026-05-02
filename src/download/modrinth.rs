@@ -39,8 +39,8 @@ pub async fn get_file(entry: Mod, dir: &Path) -> Result<(), Box<dyn Error>> {
         path
     };
     let url = get_download_url(&entry).await?;
-    let validated_download_url = validate_canonicalize_download_url(&url)?;
-    let data = reqwest::get(validated_download_url).await?.bytes().await?;
+    let url = validate_canonicalize_download_url(&url)?;
+    let data = reqwest::get(url).await?.bytes().await?;
     let mut out_file = File::create(out_filename).await?;
     io::copy(&mut data.as_ref(), &mut out_file).await?;
     println!("[INFO] {}: Downloaded", name);
@@ -68,7 +68,8 @@ pub async fn get_download_url(entry: &Mod) -> Result<String, Box<dyn Error>> {
         .iter()
         .find(|file| file.filename == *name)
         .unwrap();
-    Ok(file.url.clone())
+    let url = validate_canonicalize_download_url(&file.url)?;
+    Ok(url.to_string())
 }
 
 fn validate_id(id: &str) -> Result<&str, Box<dyn Error>> {
