@@ -6,6 +6,7 @@ use clap::ValueEnum;
 use std::error::Error;
 use std::path::Path;
 use tokio::fs;
+use tokio::task::JoinError;
 use tokio::task::JoinHandle;
 
 pub(crate) mod curseforge;
@@ -51,10 +52,22 @@ pub async fn run(command: Commands, config: Config) -> Result<(), Box<dyn Error>
             }))
         }
     }
+    let mut errors: Vec<JoinError> = vec![];
     for task in tasks {
-        task.await?;
+        if let Err(err) = task.await {
+            errors.push(err);
+        }
     }
-    Ok(())
+    if errors.is_empty() {
+        Ok(())
+    } else {
+        let error = errors
+            .iter()
+            .map(|err| format!("{}", err))
+            .collect::<Vec<_>>()
+            .join("\n");
+        Err(error.into())
+    }
 }
 
 async fn get_file(
