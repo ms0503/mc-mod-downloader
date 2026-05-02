@@ -47,6 +47,7 @@ pub struct GeneratePageOptions {
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq, ValueEnum)]
 pub enum Source {
+    #[value(name = "curseforge")]
     CurseForge,
     File,
     Modrinth

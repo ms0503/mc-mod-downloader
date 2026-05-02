@@ -27,4 +27,4 @@ authors = ["Sora Tonami <ms0503@outlook.com>"]
 edition = "2024"
 license-file = "LICENSE.md"
 name = "mc-mod-downloader"
-version = "0.1.3"
+version = "0.1.4"
