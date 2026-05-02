@@ -24,7 +24,7 @@ pub async fn get_file(entry: Mod, dir: &Path) -> Result<(), Box<dyn Error>> {
         path
     };
     let url = get_download_url(&entry).await?;
-    let validated_download_url = validate_modrinth_download_url(&url)?;
+    let validated_download_url = validate_download_url(&url)?;
     let data = reqwest::get(validated_download_url).await?.bytes().await?;
     let mut out_file = File::create(out_filename).await?;
     io::copy(&mut data.as_ref(), &mut out_file).await?;
@@ -41,7 +41,7 @@ pub async fn get_download_url(entry: &Mod) -> Result<String, Box<dyn Error>> {
     else {
         unreachable!()
     };
-    let api_url = validate_modrinth_api_url(version_id)?;
+    let api_url = validate_api_url(version_id)?;
     let version = reqwest::get(api_url)
         .await?
         .json::<GetVersionResponse>()
@@ -54,7 +54,7 @@ pub async fn get_download_url(entry: &Mod) -> Result<String, Box<dyn Error>> {
     Ok(file.url.clone())
 }
 
-fn validate_modrinth_api_url(version_id: &str) -> Result<Url, Box<dyn Error>> {
+fn validate_api_url(version_id: &str) -> Result<Url, Box<dyn Error>> {
     let url = Url::parse(&format!(
         "https://{}{}/{}",
         MODRINTH_API_HOST, MODRINTH_API_GET_VERSION_BASE, version_id
@@ -74,7 +74,7 @@ fn validate_modrinth_api_url(version_id: &str) -> Result<Url, Box<dyn Error>> {
     }
 }
 
-fn validate_modrinth_download_url(raw: &str) -> Result<Url, Box<dyn Error>> {
+fn validate_download_url(raw: &str) -> Result<Url, Box<dyn Error>> {
     let url = Url::parse(raw)?;
     let is_valid = url.scheme() == "https"
         && url.host_str() == Some(MODRINTH_DOWNLOAD_HOST)
