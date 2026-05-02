@@ -1,5 +1,6 @@
 use crate::config::Mod;
 use crate::models::modrinth::GetVersionResponse;
+use lazy_regex::regex;
 use reqwest::Url;
 use std::error::Error;
 use std::path::Path;
@@ -13,11 +14,16 @@ const MODRINTH_DOWNLOAD_HOST: &str = "cdn.modrinth.com";
 
 pub async fn get_file(entry: Mod, dir: &Path) -> Result<(), Box<dyn Error>> {
     let Mod::Modrinth {
-        name, ..
+        name,
+        project_id,
+        version_id,
+        ..
     } = &entry
     else {
         unreachable!()
     };
+    let _ = validate_id(project_id)?;
+    let _ = validate_id(version_id)?;
     let out_filename = {
         let mut path = dir.to_path_buf();
         path.push(name);
@@ -41,6 +47,7 @@ pub async fn get_download_url(entry: &Mod) -> Result<String, Box<dyn Error>> {
     else {
         unreachable!()
     };
+    let version_id = validate_id(version_id)?;
     let api_url = validate_api_url(version_id)?;
     let version = reqwest::get(api_url)
         .await?
@@ -52,6 +59,15 @@ pub async fn get_download_url(entry: &Mod) -> Result<String, Box<dyn Error>> {
         .find(|file| file.filename == *name)
         .unwrap();
     Ok(file.url.clone())
+}
+
+fn validate_id(id: &str) -> Result<&str, Box<dyn Error>> {
+    let pattern = regex!(r#"^[\w!@$()`.+,"\-']{3,64}$"#);
+    if pattern.is_match(id) {
+        Ok(id)
+    } else {
+        Err("Invalid Modrinth ID".into())
+    }
 }
 
 fn validate_api_url(version_id: &str) -> Result<Url, Box<dyn Error>> {
