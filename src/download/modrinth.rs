@@ -57,7 +57,8 @@ pub async fn get_download_url(entry: &Mod) -> Result<String, Box<dyn Error>> {
         unreachable!()
     };
     let version_id = validate_id(version_id)?;
-    let api_url = validate_api_url(version_id)?;
+    let version_id = urlencoding::encode(version_id);
+    let api_url = validate_api_url(&version_id)?;
     let version = reqwest::get(api_url)
         .await?
         .json::<GetVersionResponse>()
