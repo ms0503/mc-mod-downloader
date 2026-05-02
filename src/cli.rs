@@ -1,6 +1,7 @@
 use crate::download::Sides;
 use clap::Parser;
 use clap::Subcommand;
+use clap::ValueEnum;
 use std::path::PathBuf;
 
 #[derive(Debug, Parser)]
@@ -23,6 +24,9 @@ pub enum Commands {
         /// Whether to include optional mods
         #[arg(long, short = 'o')]
         include_optional: bool,
+        /// Mod sources to skip
+        #[arg(long, value_delimiter = ',')]
+        skip_source: Vec<Source>,
         /// Side of mod(s) to download
         #[arg(long, short, value_enum)]
         side: Sides
@@ -33,4 +37,11 @@ pub enum Commands {
         #[arg(default_value = "mods.html", long, short)]
         out: PathBuf
     }
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq, ValueEnum)]
+pub enum Source {
+    CurseForge,
+    File,
+    Modrinth
 }

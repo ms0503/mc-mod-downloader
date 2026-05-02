@@ -1,4 +1,5 @@
 use crate::cli::Commands;
+use crate::cli::Source;
 use crate::config::Config;
 use crate::config::Mod;
 use crate::config::Requirement;
@@ -25,6 +26,7 @@ pub async fn run(command: Commands, config: Config) -> Result<(), Box<dyn Error>
     let Commands::Download {
         dir,
         include_optional,
+        skip_source,
         side
     } = command
     else {
@@ -37,15 +39,30 @@ pub async fn run(command: Commands, config: Config) -> Result<(), Box<dyn Error>
     for entry in config.mods {
         let dir = dir.clone();
         let name = entry.name().clone();
+        let skip_source = skip_source.clone();
         match side {
             Sides::Client => tasks.push(tokio::spawn(async move {
-                if let Err(err) = get_file(entry.side().client, include_optional, entry, &dir).await
+                if let Err(err) = get_file(
+                    entry.side().client,
+                    include_optional,
+                    entry,
+                    &dir,
+                    &skip_source
+                )
+                .await
                 {
                     eprintln!("[ERROR] {}: Failed to download: {}", name, err);
                 }
             })),
             Sides::Server => tasks.push(tokio::spawn(async move {
-                if let Err(err) = get_file(entry.side().server, include_optional, entry, &dir).await
+                if let Err(err) = get_file(
+                    entry.side().server,
+                    include_optional,
+                    entry,
+                    &dir,
+                    &skip_source
+                )
+                .await
                 {
                     eprintln!("[ERROR] {}: Failed to download: {}", name, err);
                 }
@@ -74,7 +91,8 @@ async fn get_file(
     requirement: Requirement,
     include_optional: bool,
     entry: Mod,
-    dir: &Path
+    dir: &Path,
+    skip_source: &[Source]
 ) -> Result<(), Box<dyn Error>> {
     match requirement {
         Requirement::None => Ok(()),
@@ -82,13 +100,23 @@ async fn get_file(
         _ => match entry {
             Mod::CurseForge {
                 ..
-            } => curseforge::get_file(entry, dir).await,
+            } if skip_source
+                .iter()
+                .find(|s| **s == Source::CurseForge)
+                .is_none() =>
+                curseforge::get_file(entry, dir).await,
             Mod::File {
                 ..
-            } => file::get_file(entry, dir).await,
+            } if skip_source.iter().find(|s| **s == Source::File).is_none() =>
+                file::get_file(entry, dir).await,
             Mod::Modrinth {
                 ..
-            } => modrinth::get_file(entry, dir).await
+            } if skip_source
+                .iter()
+                .find(|s| **s == Source::Modrinth)
+                .is_none() =>
+                modrinth::get_file(entry, dir).await,
+            _ => Ok(())
         }
     }
 }
