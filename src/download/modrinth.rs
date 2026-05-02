@@ -39,7 +39,7 @@ pub async fn get_file(entry: Mod, dir: &Path) -> Result<(), Box<dyn Error>> {
         path
     };
     let url = get_download_url(&entry).await?;
-    let validated_download_url = validate_download_url(&url)?;
+    let validated_download_url = validate_canonicalize_download_url(&url)?;
     let data = reqwest::get(validated_download_url).await?.bytes().await?;
     let mut out_file = File::create(out_filename).await?;
     io::copy(&mut data.as_ref(), &mut out_file).await?;
@@ -80,10 +80,11 @@ fn validate_id(id: &str) -> Result<&str, Box<dyn Error>> {
 }
 
 fn validate_api_url(version_id: &str) -> Result<Url, Box<dyn Error>> {
-    let url = Url::parse(&format!(
-        "https://{}{}/{}",
-        MODRINTH_API_HOST, MODRINTH_API_GET_VERSION_BASE, version_id
-    ))?;
+    let url = {
+        let mut url = Url::parse(&format!("https://{}", MODRINTH_API_HOST))?;
+        url.set_path(&format!("{}/{}", MODRINTH_API_GET_VERSION_BASE, version_id));
+        url
+    };
     let is_valid = url.scheme() == "https"
         && url.host_str() == Some(MODRINTH_API_HOST)
         && url.username().is_empty()
@@ -98,7 +99,7 @@ fn validate_api_url(version_id: &str) -> Result<Url, Box<dyn Error>> {
     }
 }
 
-fn validate_download_url(raw: &str) -> Result<Url, Box<dyn Error>> {
+fn validate_canonicalize_download_url(raw: &str) -> Result<Url, Box<dyn Error>> {
     let url = Url::parse(raw)?;
     let is_valid = url.scheme() == "https"
         && url.host_str() == Some(MODRINTH_DOWNLOAD_HOST)
@@ -108,7 +109,10 @@ fn validate_download_url(raw: &str) -> Result<Url, Box<dyn Error>> {
         && validate_path(url.path()).is_ok()
         && MODRINTH_DOWNLOAD_PATH_PATTERN.is_match(url.path());
     if is_valid {
-        Ok(url)
+        let mut canonical_url = Url::parse(&format!("https://{}", MODRINTH_DOWNLOAD_HOST))?;
+        canonical_url.set_path(url.path());
+        canonical_url.set_query(url.query());
+        Ok(canonical_url)
     } else {
         Err("Invalid Modrinth download URL".into())
     }

@@ -39,7 +39,7 @@ pub async fn get_file(entry: Mod, dir: &Path) -> Result<(), Box<dyn Error>> {
         path
     };
     let url = get_download_url(&entry).await?;
-    let url = validate_download_url(&url)?;
+    let url = validate_canonicalize_download_url(&url)?;
     let data = reqwest::get(url).await?.bytes().await?;
     let mut out_file = File::create(out_filename).await?;
     io::copy(&mut data.as_ref(), &mut out_file).await?;
@@ -68,10 +68,14 @@ pub async fn get_download_url(entry: &Mod) -> Result<String, Box<dyn Error>> {
 }
 
 fn validate_api_url(project_id: u32, file_id: u32) -> Result<Url, Box<dyn Error>> {
-    let url = Url::parse(&format!(
-        "https://{}{}/{}/files/{}/download-url",
-        CURSEFORGE_API_HOST, CURSEFORGE_API_GET_MOD_BASE, project_id, file_id
-    ))?;
+    let url = {
+        let mut url = Url::parse(&format!("https://{}", CURSEFORGE_API_HOST))?;
+        url.set_path(&format!(
+            "{}/{}/files/{}/download-url",
+            CURSEFORGE_API_GET_MOD_BASE, project_id, file_id
+        ));
+        url
+    };
     let is_valid = url.scheme() == "https"
         && url.host_str() == Some(CURSEFORGE_API_HOST)
         && url.username().is_empty()
@@ -86,7 +90,7 @@ fn validate_api_url(project_id: u32, file_id: u32) -> Result<Url, Box<dyn Error>
     }
 }
 
-fn validate_download_url(raw: &str) -> Result<Url, Box<dyn Error>> {
+fn validate_canonicalize_download_url(raw: &str) -> Result<Url, Box<dyn Error>> {
     let url = Url::parse(raw)?;
     let is_valid = url.scheme() == "https"
         && url.host_str() == Some(CURSEFORGE_DOWNLOAD_HOST)
@@ -96,7 +100,10 @@ fn validate_download_url(raw: &str) -> Result<Url, Box<dyn Error>> {
         && validate_path(url.path()).is_ok()
         && CURSEFORGE_DOWNLOAD_PATH_PATTERN.is_match(url.path());
     if is_valid {
-        Ok(url)
+        let mut canonical_url = Url::parse(&format!("https://{}", CURSEFORGE_DOWNLOAD_HOST))?;
+        canonical_url.set_path(url.path());
+        canonical_url.set_query(url.query());
+        Ok(canonical_url)
     } else {
         Err("Invalid CurseForge download URL".into())
     }
