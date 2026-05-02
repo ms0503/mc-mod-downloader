@@ -103,7 +103,6 @@ fn validate_canonicalize_download_url(raw: &str) -> Result<Url, Box<dyn Error>> 
     if is_valid {
         let mut canonical_url = Url::parse(&format!("https://{}", CURSEFORGE_DOWNLOAD_HOST))?;
         canonical_url.set_path(url.path());
-        canonical_url.set_query(url.query());
         Ok(canonical_url)
     } else {
         Err("Invalid CurseForge download URL".into())
